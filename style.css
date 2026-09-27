@@ -1,0 +1,417 @@
+/* ============================================
+   style.css — профиль 0extra (orbit layout)
+   ============================================ */
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+:root {
+  --pink: #ff4fa3;
+  --pink-soft: #ff4fa355;
+  --text: #ffffff;
+  --bg: #080808;
+}
+
+html, body {
+  height: 100%;
+  background: var(--bg);
+  color: var(--text);
+  font-family: 'Onest', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+  overflow: hidden;
+}
+
+/* Фон */
+#bg {
+  position: fixed;
+  inset: 0;
+  background: url('assets/111011.jpg') center/cover no-repeat;
+  filter: brightness(0.5);
+  z-index: 0;
+}
+#bg-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.35);
+  z-index: 1;
+}
+
+/* Экран "click to enter" */
+#enter-screen {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0,0,0,0.85);
+  z-index: 100;
+  cursor: pointer;
+  font-size: 22px;
+  letter-spacing: 2px;
+  transition: opacity 0.5s;
+}
+#enter-screen.hidden { opacity: 0; pointer-events: none; }
+
+/* Обёртка для перспективы */
+.card-wrapper {
+  position: fixed;
+  top: 50%; left: 50%;
+  transform: translate(-50%, -50%);
+  perspective: 900px;
+  z-index: 10;
+}
+
+/* ============================================
+   Центральная карточка
+   ============================================ */
+.card {
+  --orbit-radius: 105px;       /* расстояние от центра до иконок */
+  --orbit-icon-size: 34px;     /* размер кликабельной зоны иконки */
+  --avatar-size: 108px;        /* размер аватарки */
+
+  width: 380px;
+  padding: 25px 25px 25px;
+  background: rgba(20, 20, 20, 0.55);
+  backdrop-filter: blur(15px);
+  -webkit-backdrop-filter: blur(15px);
+  border-radius: 20px;
+  border: 1px solid rgba(255,255,255,0.08);
+  box-shadow:
+    0 0 0 1px var(--pink-soft),
+    0 0 25px var(--pink-soft),
+    0 0 60px var(--pink-soft),
+    inset 0 0 30px rgba(255,79,163,0.08);
+  text-align: center;
+  transform-style: preserve-3d;
+  transition: transform 0.15s ease-out, box-shadow 0.4s;
+  will-change: transform;
+}
+.card:hover {
+  box-shadow:
+    0 0 0 1px var(--pink),
+    0 0 35px var(--pink-soft),
+    0 0 80px var(--pink-soft),
+    inset 0 0 40px rgba(255,79,163,0.15);
+}
+
+.card > * {
+  transform: translateZ(30px);
+}
+
+/* ============================================
+   Орбита: аватар в центре + иконки по кругу
+   ============================================ */
+.orbit {
+  position: relative;
+  width: 280px;
+  height: 280px;
+  margin: 0 auto 10px;
+}
+
+/* Вращающееся пунктирное кольцо */
+.orbit-ring {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: calc(var(--orbit-radius) * 2);
+  height: calc(var(--orbit-radius) * 2);
+  transform: translate(-50%, -50%);
+  border-radius: 50%;
+  background: repeating-conic-gradient(
+    from 0deg,
+    rgba(255, 79, 163, 0.55) 0deg 1.5deg,
+    transparent 1.5deg 10deg
+  );
+  -webkit-mask: radial-gradient(
+    circle,
+    transparent calc(50% - 1px),
+    #000 calc(50% - 1px),
+    #000 calc(50% + 1px),
+    transparent calc(50% + 1px)
+  );
+  mask: radial-gradient(
+    circle,
+    transparent calc(50% - 1px),
+    #000 calc(50% - 1px),
+    #000 calc(50% + 1px),
+    transparent calc(50% + 1px)
+  );
+  animation: orbit-spin 40s linear infinite;
+  pointer-events: none;
+  z-index: 0;
+}
+
+@keyframes orbit-spin {
+  to { transform: translate(-50%, -50%) rotate(360deg); }
+}
+
+/* Аватар в центре */
+.avatar {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: var(--avatar-size);
+  height: var(--avatar-size);
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid rgba(255,255,255,0.25);
+  box-shadow:
+    0 0 20px var(--pink-soft),
+    0 0 40px var(--pink-soft);
+  z-index: 1;
+}
+
+/* Иконки соцсетей вокруг аватарки */
+.orbit-icon {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: var(--orbit-icon-size);
+  height: var(--orbit-icon-size);
+  margin: calc(var(--orbit-icon-size) / -2) 0 0 calc(var(--orbit-icon-size) / -2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--pink);
+  filter: drop-shadow(0 0 6px var(--pink-soft));
+  transform:
+    rotate(var(--angle))
+    translateY(calc(var(--orbit-radius) * -1))
+    rotate(calc(var(--angle) * -1));
+  transition: filter 0.25s, transform 0.25s;
+  z-index: 2;
+}
+.orbit-icon:hover {
+  filter: drop-shadow(0 0 14px var(--pink));
+}
+.orbit-icon svg {
+  width: 22px;
+  height: 22px;
+}
+
+/* ============================================
+   Ник и био под орбитой
+   ============================================ */
+.username {
+  font-size: 24px;
+  font-weight: 700;
+  letter-spacing: 1px;
+  margin-bottom: 8px;
+  color: var(--pink);
+  text-shadow: 0 0 12px var(--pink-soft);
+}
+
+.bio {
+  font-size: 14px;
+  line-height: 1.5;
+  color: rgba(255,255,255,0.8);
+  padding: 0 5px;
+}
+
+/* ============================================
+   Нижний левый угол: просмотры + звук
+   ============================================ */
+.bottom-left {
+  position: fixed;
+  left: 18px;
+  bottom: 18px;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  z-index: 20;
+  background: rgba(20,20,20,0.5);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 1px solid rgba(255,255,255,0.08);
+  border-radius: 30px;
+  padding: 8px 16px;
+  box-shadow: 0 0 20px var(--pink-soft);
+}
+.views {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 14px;
+  color: var(--pink);
+}
+.views svg { width: 16px; height: 16px; }
+
+.divider {
+  width: 1px;
+  height: 20px;
+  background: rgba(255,255,255,0.15);
+}
+
+.volume {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--pink);
+}
+.volume svg { width: 16px; height: 16px; cursor: pointer; }
+
+.volume input[type="range"] {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 80px;
+  height: 4px;
+  border-radius: 4px;
+  background: rgba(255,255,255,0.15);
+  outline: none;
+}
+.volume input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: var(--pink);
+  cursor: pointer;
+  box-shadow: 0 0 8px var(--pink);
+}
+.volume input[type="range"]::-moz-range-thumb {
+  width: 12px;
+  height: 12px;
+  border: none;
+  border-radius: 50%;
+  background: var(--pink);
+  cursor: pointer;
+}
+
+/* Кредиты / лицензии */
+.credits {
+  position: fixed;
+  right: 18px;
+  bottom: 18px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 4px;
+  font-size: 10px;
+  color: rgba(255, 255, 255, 0.35);
+  z-index: 20;
+  opacity: 0.6;
+  transition: opacity 0.3s;
+  max-width: 260px;
+  text-align: right;
+}
+.credits:hover { opacity: 1; }
+.credits a {
+  color: var(--pink);
+  text-decoration: none;
+  border-bottom: 1px dotted var(--pink-soft);
+  opacity: 0.75;
+}
+.credits a:hover {
+  border-bottom-color: var(--pink);
+  opacity: 1;
+}
+
+/* ============================================
+   Модальное окно WeChat + matrix
+   ============================================ */
+.modal {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.35);
+  z-index: 200;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  overflow: hidden;
+}
+.modal.active { display: flex; }
+
+#wechat-matrix {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 0;
+  pointer-events: none;
+  opacity: 0.95;
+}
+
+.modal-content {
+  position: relative;
+  z-index: 2;
+  background: rgba(10, 10, 10, 0.88);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  border: 1px solid var(--pink);
+  border-radius: 20px;
+  padding: 30px 25px 20px;
+  box-shadow:
+    0 0 0 1px var(--pink),
+    0 0 30px var(--pink-soft),
+    0 0 80px var(--pink-soft),
+    inset 0 0 30px rgba(255,79,163,0.1);
+  text-align: center;
+  max-width: 90vw;
+  animation: modalIn 0.3s ease-out;
+}
+
+@keyframes modalIn {
+  from { opacity: 0; transform: scale(0.9); }
+  to   { opacity: 1; transform: scale(1); }
+}
+
+.modal-qr {
+  width: 240px;
+  height: 240px;
+  border-radius: 12px;
+  display: block;
+  object-fit: contain;
+  background: #fff;
+  padding: 8px;
+  box-shadow: 0 0 25px var(--pink-soft);
+}
+
+.modal-caption {
+  margin-top: 12px;
+  font-size: 13px;
+  color: var(--pink);
+  letter-spacing: 1px;
+  text-shadow: 0 0 10px var(--pink-soft);
+}
+
+.modal-close {
+  position: absolute;
+  top: 8px;
+  right: 14px;
+  font-size: 28px;
+  line-height: 1;
+  color: var(--pink);
+  cursor: pointer;
+  transition: transform 0.2s, color 0.2s;
+  user-select: none;
+  z-index: 3;
+  text-shadow: 0 0 10px var(--pink-soft);
+}
+.modal-close:hover {
+  transform: scale(1.2);
+  color: #fff;
+}
+
+/* ============================================
+   Мобильная адаптация
+   ============================================ */
+@media (max-width: 480px) {
+  .card {
+    width: 88vw;
+    padding: 20px 18px 20px;
+    --orbit-radius: 88px;
+    --orbit-icon-size: 30px;
+    --avatar-size: 90px;
+  }
+  .orbit { width: 240px; height: 240px; }
+  .orbit-icon svg { width: 20px; height: 20px; }
+  .username { font-size: 20px; }
+  .bio { font-size: 13px; }
+  .bottom-left { left: 12px; bottom: 12px; padding: 6px 12px; gap: 10px; }
+  .volume input[type="range"] { width: 60px; }
+  .card-wrapper { perspective: none; }
+  .card { transform: none !important; }
+  .credits { right: 12px; bottom: 12px; font-size: 9px; max-width: 180px; }
+  .modal-qr { width: 200px; height: 200px; }
+}
