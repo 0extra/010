@@ -4,6 +4,11 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>0e</title>
+
+<!-- Favicon -->
+<link rel="icon" type="image/png" href="assets/111000.png">
+<link rel="apple-touch-icon" href="assets/111000.png">
+
 <link rel="stylesheet" href="style.css">
 <link href="https://fonts.googleapis.com/css2?family=Onest:wght@300;400;500;700&display=swap" rel="stylesheet">
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;700&display=swap" rel="stylesheet">
@@ -22,8 +27,6 @@
       <div class="orbit-ring"></div>
 
       <img class="avatar" src="assets/110100.jpg" alt="avatar">
-
-      <!-- 7 иконок: каждая на своём углу (360/7 ≈ 51.43°) -->
 
       <!-- Discord (0°) -->
       <a class="orbit-icon" style="--angle: 0deg"
@@ -72,11 +75,8 @@
       </a>
     </div>
 
-    <div class="username">0extra</div>
-    <div class="bio">
-      Shine like cherry blossom ✿<br>
-      (((*°▽°*)八(*°▽°*)))♪
-    </div>
+    <div class="username" id="username"></div>
+    <div class="bio" id="bio"></div>
   </div>
 </div>
 
@@ -95,6 +95,7 @@
 <div class="credits">
   <span>Иконки: <a href="https://simpleicons.org" target="_blank">Simple Icons</a> (CC0)</span>
   <span>Шрифт: <a href="https://fonts.google.com/specimen/Onest" target="_blank">Onest</a> (OFL)</span>
+  <span>Счётчик: <a href="https://abacus.jasoncameron.dev" target="_blank">Abacus</a></span>
   <span>Музыка: <a href="https://www.youtube.com/watch?v=Js7_FxNGnDQ&list=RDJs7_FxNGnDQ&index=1" target="_blank">Болен тобой</a></span>
   <span>Изображение: <a href="https://ru.pinterest.com/pin/347692033751666948/" target="_blank">Pinterest</a></span>
   <span>Изображение: <a href="https://ru.pinterest.com/pin/752804893963443663/" target="_blank">Pinterest</a></span>
@@ -121,6 +122,8 @@
   const viewsEl = document.getElementById('views-count');
   const card = document.getElementById('card');
   const wrapper = document.querySelector('.card-wrapper');
+  const usernameEl = document.getElementById('username');
+  const bioEl = document.getElementById('bio');
 
   // === Громкость ===
   music.volume = 0.5;
@@ -145,9 +148,11 @@
   enterScreen.addEventListener('click', () => {
     enterScreen.classList.add('hidden');
     music.play().catch(()=>{});
+    startTypewriterName();
+    startTypewriterBio();
   });
 
-  // === Физика карточки: наклон за курсором ===
+  // === Физика карточки ===
   const MAX_TILT = 14;
   const LIFT = 8;
 
@@ -170,13 +175,13 @@
     card.style.transform = 'rotateX(0) rotateY(0) translateZ(0)';
   });
 
-  // === Счётчик просмотров ===
-  fetch('https://api.counterapi.dev/v1/0extra-profile/visits/up')
+  // === Счётчик просмотров (Abacus) ===
+  fetch('https://abacus.jasoncameron.dev/hit/0extra-profile/visits')
     .then(r => r.json())
-    .then(d => { if (d && d.count) viewsEl.textContent = d.count; })
+    .then(d => { if (d && d.value !== undefined) viewsEl.textContent = d.value; })
     .catch(() => { viewsEl.textContent = '1'; });
 
-  // === WeChat QR: модальное окно ===
+  // === WeChat QR ===
   const wechatBtn = document.getElementById('wechat-btn');
   const wechatModal = document.getElementById('wechat-modal');
   const wechatClose = document.getElementById('wechat-close');
@@ -202,7 +207,7 @@
     }
   });
 
-  // === Matrix-эффект: китайские иероглифы в розовом ===
+  // === Matrix-эффект ===
   (function initMatrix() {
     const canvas = document.getElementById('wechat-matrix');
     const ctx = canvas.getContext('2d');
@@ -272,16 +277,60 @@
 
     window.addEventListener('resize', resize);
 
-    const modal = document.getElementById('wechat-modal');
     const observer = new MutationObserver(() => {
-      if (modal.classList.contains('active')) {
+      if (wechatModal.classList.contains('active')) {
         setTimeout(start, 30);
       } else {
         stop();
       }
     });
-    observer.observe(modal, { attributes: true, attributeFilter: ['class'] });
+    observer.observe(wechatModal, { attributes: true, attributeFilter: ['class'] });
   })();
+
+  // ============================================
+  // Typewriter: ник и био
+  // ============================================
+
+  const NAME = '0extra';
+  let nameIdx = 0;
+
+  function startTypewriterName() {
+    if (nameIdx <= NAME.length) {
+      usernameEl.textContent = NAME.slice(0, nameIdx);
+      nameIdx++;
+      setTimeout(startTypewriterName, 180);
+    }
+  }
+
+  const BIO_MESSAGES = [
+    'Shine like cherry blossom ✿\n\n(((*°▽°*)八(*°▽°*)))♪',
+    'Zero extra, infinite vibes ✦'
+  ];
+
+  let bioMsgIdx = 0;
+  let bioCharIdx = 0;
+  let isBioDeleting = false;
+
+  function startTypewriterBio() {
+    const current = BIO_MESSAGES[bioMsgIdx];
+
+    if (!isBioDeleting && bioCharIdx < current.length) {
+      bioCharIdx++;
+      bioEl.textContent = current.slice(0, bioCharIdx);
+      setTimeout(startTypewriterBio, 55);
+    } else if (!isBioDeleting && bioCharIdx === current.length) {
+      isBioDeleting = true;
+      setTimeout(startTypewriterBio, 2500);
+    } else if (isBioDeleting && bioCharIdx > 0) {
+      bioCharIdx--;
+      bioEl.textContent = current.slice(0, bioCharIdx);
+      setTimeout(startTypewriterBio, 25);
+    } else {
+      isBioDeleting = false;
+      bioMsgIdx = (bioMsgIdx + 1) % BIO_MESSAGES.length;
+      setTimeout(startTypewriterBio, 400);
+    }
+  }
 </script>
 </body>
 </html>

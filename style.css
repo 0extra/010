@@ -63,9 +63,9 @@ html, body {
    Центральная карточка
    ============================================ */
 .card {
-  --orbit-radius: 105px;       /* расстояние от центра до иконок */
-  --orbit-icon-size: 34px;     /* размер кликабельной зоны иконки */
-  --avatar-size: 108px;        /* размер аватарки */
+  --orbit-radius: 105px;
+  --orbit-icon-size: 34px;
+  --avatar-size: 108px;
 
   width: 380px;
   padding: 25px 25px 25px;
@@ -106,7 +106,6 @@ html, body {
   margin: 0 auto 10px;
 }
 
-/* Вращающееся пунктирное кольцо */
 .orbit-ring {
   position: absolute;
   top: 50%;
@@ -143,7 +142,6 @@ html, body {
   to { transform: translate(-50%, -50%) rotate(360deg); }
 }
 
-/* Аватар в центре */
 .avatar {
   position: absolute;
   top: 50%;
@@ -160,7 +158,6 @@ html, body {
   z-index: 1;
 }
 
-/* Иконки соцсетей вокруг аватарки */
 .orbit-icon {
   position: absolute;
   top: 50%;
@@ -188,9 +185,6 @@ html, body {
   height: 22px;
 }
 
-/* ============================================
-   Ник и био под орбитой
-   ============================================ */
 .username {
   font-size: 24px;
   font-weight: 700;
@@ -198,6 +192,7 @@ html, body {
   margin-bottom: 8px;
   color: var(--pink);
   text-shadow: 0 0 12px var(--pink-soft);
+  min-height: 1.2em;
 }
 
 .bio {
@@ -205,6 +200,8 @@ html, body {
   line-height: 1.5;
   color: rgba(255,255,255,0.8);
   padding: 0 5px;
+  min-height: 3em;
+  white-space: pre-line;
 }
 
 /* ============================================
