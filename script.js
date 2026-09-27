@@ -389,14 +389,12 @@ document.addEventListener('mouseleave', () => {
 });
 
 // ============================================
-// Счётчик просмотров — ОТКЛЮЧЁН
+// Счётчик просмотров
 // ============================================
-/*
 fetch('https://abacus.jasoncameron.dev/hit/0extra-profile/visits')
   .then(r => r.json())
   .then(d => { if (d && d.value !== undefined) viewsEl.textContent = d.value; })
   .catch(() => { viewsEl.textContent = '—'; });
-*/
 viewsEl.textContent = '—';
 
 // ============================================
